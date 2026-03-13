@@ -1,0 +1,42 @@
+.email-input {
+    margin-bottom: 7px;
+    border-radius: 5px;
+    border-width: 1px;
+    padding: 7px;
+}
+
+.password-input {
+    border-radius: 5px;
+    border-width: 1px;
+    padding: 7px;
+}
+
+.login-button {
+    background: rgb(0, 123, 255);
+    color: white;
+    cursor: pointer;
+
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: none;
+
+    margin-top: 10px;
+}
+
+.sign-up-button {
+    background: rgb(0, 123, 255);
+    color: white;
+    cursor: pointer;
+
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: none;
+
+    margin-top: 10px;
+    margin-left: 5px;
+
+}
+
+.password-visible-button {
+    margin-left: 10px;
+}
