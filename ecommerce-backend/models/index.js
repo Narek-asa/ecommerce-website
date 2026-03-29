@@ -1,8 +1,5 @@
 import { Sequelize } from 'sequelize';
-import { createRequire } from 'module';
-
-const require = createRequire(import.meta.url);
-const pg = require('pg');
+import pg from 'pg';
 
 const databaseUrl = process.env.DATABASE_URL;
 
@@ -15,12 +12,5 @@ export const sequelize = new Sequelize(databaseUrl, {
   dialectModule: pg,
   logging: false,
   dialectOptions:
-      process.env.NODE_ENV === 'production'
-        ? {
-          ssl: {
-            require: true,
-            rejectUnauthorized: false
-          }
-        }
-        : {}
+      process.env.NODE_ENV === 'production' ? {ssl: {require: true, rejectUnauthorized: false,},} : {},
 });
