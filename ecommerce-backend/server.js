@@ -22,83 +22,59 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Middleware
 app.use(cors());
 app.use(express.json());
-
-// Serve images if they are inside this backend project
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
-// Routes
-app.use('/api/products', productRoutes);
-app.use('/api/delivery-options', deliveryOptionRoutes);
-app.use('/api/cart-items', cartItemRoutes);
-app.use('/api/orders', orderRoutes);
-app.use('/api/reset', resetRoutes);
-app.use('/api/payment-summary', paymentSummaryRoutes);
+let initializePromise;
 
-// Simple health check
-app.get('/api/health', (req, res) => {
-  res.json({ ok: true });
-});
+function initializeDatabase() {
+  if (initializePromise) return initializePromise;
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
-});
+  initializePromise = (async () => {
+    await sequelize.sync();
 
-let initialized = false;
+    const productCount = await Product.count();
 
-console.log('server start');
-console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
+    if (productCount === 0) {
+      const timestamp = Date.now();
 
-async function initializeDatabase() {
-  if (initialized) return;
+      const productsWithTimestamps = defaultProducts.map((product, index) => ({
+        ...product,
+        createdAt: new Date(timestamp + index),
+        updatedAt: new Date(timestamp + index),
+      }));
 
-  await sequelize.sync();
+      const deliveryOptionsWithTimestamps = defaultDeliveryOptions.map((option, index) => ({
+        ...option,
+        createdAt: new Date(timestamp + index),
+        updatedAt: new Date(timestamp + index),
+      }));
 
-  const productCount = await Product.count();
+      const cartItemsWithTimestamps = defaultCart.map((item, index) => ({
+        ...item,
+        createdAt: new Date(timestamp + index),
+        updatedAt: new Date(timestamp + index),
+      }));
 
-  if (productCount === 0) {
-    const timestamp = Date.now();
+      const ordersWithTimestamps = defaultOrders.map((order, index) => ({
+        ...order,
+        createdAt: new Date(timestamp + index),
+        updatedAt: new Date(timestamp + index),
+      }));
 
-    const productsWithTimestamps = defaultProducts.map((product, index) => ({
-      ...product,
-      createdAt: new Date(timestamp + index),
-      updatedAt: new Date(timestamp + index),
-    }));
+      await Product.bulkCreate(productsWithTimestamps);
+      await DeliveryOption.bulkCreate(deliveryOptionsWithTimestamps);
+      await CartItem.bulkCreate(cartItemsWithTimestamps);
+      await Order.bulkCreate(ordersWithTimestamps);
 
-    const deliveryOptionsWithTimestamps = defaultDeliveryOptions.map((option, index) => ({
-      ...option,
-      createdAt: new Date(timestamp + index),
-      updatedAt: new Date(timestamp + index),
-    }));
+      console.log('Default data added to the database.');
+    }
+  })();
 
-    const cartItemsWithTimestamps = defaultCart.map((item, index) => ({
-      ...item,
-      createdAt: new Date(timestamp + index),
-      updatedAt: new Date(timestamp + index),
-    }));
-
-    const ordersWithTimestamps = defaultOrders.map((order, index) => ({
-      ...order,
-      createdAt: new Date(timestamp + index),
-      updatedAt: new Date(timestamp + index),
-    }));
-
-    await Product.bulkCreate(productsWithTimestamps);
-    await DeliveryOption.bulkCreate(deliveryOptionsWithTimestamps);
-    await CartItem.bulkCreate(cartItemsWithTimestamps);
-    await Order.bulkCreate(ordersWithTimestamps);
-
-    console.log('Default data added to the database.');
-  }
-
-  initialized = true;
+  return initializePromise;
 }
 
-// Initialize before handling requests
 app.use(async (req, res, next) => {
   try {
     await initializeDatabase();
@@ -106,6 +82,22 @@ app.use(async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+});
+
+app.use('/api/products', productRoutes);
+app.use('/api/delivery-options', deliveryOptionRoutes);
+app.use('/api/cart-items', cartItemRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/reset', resetRoutes);
+app.use('/api/payment-summary', paymentSummaryRoutes);
+
+app.get('/api/health', (req, res) => {
+  res.json({ ok: true });
+});
+
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Something went wrong!' });
 });
 
 export default app;
