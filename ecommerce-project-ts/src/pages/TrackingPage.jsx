@@ -5,6 +5,7 @@ import { Header } from '../components/Header.tsx';
 import { Link } from 'react-router';
 import { useEffect, useState } from 'react';
 import './TrackingPage.css';
+import { IMAGE_BASE } from '../api/config.js';
 
 export function TrackingPage({ cart }) {
   const { orderId, productId } = useParams();
@@ -12,9 +13,7 @@ export function TrackingPage({ cart }) {
 
   useEffect(() => {
     const fetchTrackingData = async () => {
-      const response = await axios.get(
-        `/api/orders/${orderId}?expand=products`
-      );
+      const response = await axios.get(`api/orders/${orderId}?expand=products`);
       setOrder(response.data);
     };
 
@@ -68,7 +67,10 @@ export function TrackingPage({ cart }) {
 
           <div className="product-info">Quantity: {orderProduct.quantity}</div>
 
-          <img className="product-image" src={orderProduct.product.image} />
+          <img
+            className="product-image"
+            src={`${IMAGE_BASE}/${orderProduct.product.image}`}
+          />
 
           <div className="progress-labels-container">
             <div

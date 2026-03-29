@@ -2,13 +2,14 @@ import { formatMoney } from '../../utils/money.ts';
 import { DeliveryOptions } from './DeliveryOptions.jsx';
 import axios from 'axios';
 import { useState } from 'react';
+import { IMAGE_BASE } from '../../api/config.js';
 
 export function CartItemDetails({ cartItem, deliveryOptions, loadCart }) {
   const [isUpdatingQuantity, setIsUpdatingQuantity] = useState(false);
   const [quantity, setQuantity] = useState(cartItem.quantity);
 
   const deleteCartItem = async () => {
-    await axios.delete(`/api/cart-items/${cartItem.productId}`);
+    await axios.delete(`api/cart-items/${cartItem.productId}`);
     await loadCart();
   };
 
@@ -43,7 +44,10 @@ export function CartItemDetails({ cartItem, deliveryOptions, loadCart }) {
   return (
     <>
       <div className="cart-item-details-grid">
-        <img className="product-image" src={cartItem.product.image} />
+        <img
+          className="product-image"
+          src={`${IMAGE_BASE}/${cartItem.product.image}`}
+        />
 
         <div className="cart-item-details">
           <div className="product-name">{cartItem.product.name}</div>

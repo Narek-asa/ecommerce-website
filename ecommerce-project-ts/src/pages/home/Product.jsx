@@ -2,13 +2,14 @@ import { formatMoney } from '../../utils/money.ts';
 import { useState } from 'react';
 import axios from 'axios';
 import CheckMarkIcon from '../../assets/images/icons/checkmark.png';
+import { IMAGE_BASE } from '../../api/config.js';
 
 export function Product({ product, loadCart }) {
   const [quantity, setQuantity] = useState(1);
   const [showAddedMessage, setShowAddedMessage] = useState(false);
 
   const addToCart = async () => {
-    await axios.post('/api/cart-items', {
+    await axios.post('api/cart-items', {
       productId: product.id,
       quantity,
     });
@@ -32,7 +33,7 @@ export function Product({ product, loadCart }) {
         <img
           className="product-image"
           data-testid="product-image"
-          src={product.image}
+          src={`${IMAGE_BASE}/${product.image}`}
         />
       </div>
 
@@ -42,7 +43,7 @@ export function Product({ product, loadCart }) {
         <img
           className="product-rating-stars"
           data-testid={'product-rating-stars-image'}
-          src={`images/ratings/rating-${product.rating.stars * 10}.png`}
+          src={`${IMAGE_BASE}/images/ratings/rating-${product.rating.stars * 10}.png`}
         />
         <div className="product-rating-count link-primary">
           {product.rating.count}

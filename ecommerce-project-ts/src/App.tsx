@@ -6,7 +6,10 @@ import { CheckoutPage } from './pages/checkout/CheckoutPage.jsx';
 import { OrdersPage } from './pages/orders/OrdersPage.jsx';
 import { TrackingPage } from './pages/TrackingPage.jsx';
 import { ErrorPage } from './pages/ErrorPage.jsx';
+import { API_BASE } from './api/config.js';
 import './App.css';
+
+axios.defaults.baseURL = API_BASE;
 
 // @ts-ignore
 window.axios = axios;
@@ -15,7 +18,7 @@ function App() {
   const [cart, setCart] = useState([]);
 
   const loadCart = async () => {
-    const response = await axios.get('/api/cart-items?expand=product');
+    const response = await axios.get('api/cart-items?expand=product');
     setCart(response.data);
   };
 
