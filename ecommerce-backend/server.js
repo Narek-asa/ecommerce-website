@@ -17,10 +17,8 @@ import { defaultProducts } from './defaultData/defaultProducts.js';
 import { defaultDeliveryOptions } from './defaultData/defaultDeliveryOptions.js';
 import { defaultCart } from './defaultData/defaultCart.js';
 import { defaultOrders } from './defaultData/defaultOrders.js';
-import fs from 'fs';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -28,10 +26,10 @@ const __dirname = path.dirname(__filename);
 app.use(cors());
 app.use(express.json());
 
-// Serve images from the images folder
+// Serve images if they are inside this backend project
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
-// Use routes
+// Routes
 app.use('/api/products', productRoutes);
 app.use('/api/delivery-options', deliveryOptionRoutes);
 app.use('/api/cart-items', cartItemRoutes);
@@ -39,67 +37,72 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/reset', resetRoutes);
 app.use('/api/payment-summary', paymentSummaryRoutes);
 
-// Serve static files from the dist folder
-app.use(express.static(path.join(__dirname, 'dist')));
-
-// Catch-all route to serve index.html for any unmatched routes
-app.get('*', (req, res) => {
-  const indexPath = path.join(__dirname, 'dist', 'index.html');
-  if (fs.existsSync(indexPath)) {
-    res.sendFile(indexPath);
-  } else {
-    res.status(404).send('index.html not found');
-  }
+// Simple health check
+app.get('/api/health', (req, res) => {
+  res.json({ ok: true });
 });
 
 // Error handling middleware
-/* eslint-disable no-unused-vars */
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Something went wrong!' });
 });
-/* eslint-enable no-unused-vars */
 
-// Sync database and load default data if none exist
-await sequelize.sync();
+let initialized = false;
 
-const productCount = await Product.count();
-if (productCount === 0) {
-  const timestamp = Date.now();
+async function initializeDatabase() {
+  if (initialized) return;
 
-  const productsWithTimestamps = defaultProducts.map((product, index) => ({
-    ...product,
-    createdAt: new Date(timestamp + index),
-    updatedAt: new Date(timestamp + index)
-  }));
+  await sequelize.sync();
 
-  const deliveryOptionsWithTimestamps = defaultDeliveryOptions.map((option, index) => ({
-    ...option,
-    createdAt: new Date(timestamp + index),
-    updatedAt: new Date(timestamp + index)
-  }));
+  const productCount = await Product.count();
 
-  const cartItemsWithTimestamps = defaultCart.map((item, index) => ({
-    ...item,
-    createdAt: new Date(timestamp + index),
-    updatedAt: new Date(timestamp + index)
-  }));
+  if (productCount === 0) {
+    const timestamp = Date.now();
 
-  const ordersWithTimestamps = defaultOrders.map((order, index) => ({
-    ...order,
-    createdAt: new Date(timestamp + index),
-    updatedAt: new Date(timestamp + index)
-  }));
+    const productsWithTimestamps = defaultProducts.map((product, index) => ({
+      ...product,
+      createdAt: new Date(timestamp + index),
+      updatedAt: new Date(timestamp + index),
+    }));
 
-  await Product.bulkCreate(productsWithTimestamps);
-  await DeliveryOption.bulkCreate(deliveryOptionsWithTimestamps);
-  await CartItem.bulkCreate(cartItemsWithTimestamps);
-  await Order.bulkCreate(ordersWithTimestamps);
+    const deliveryOptionsWithTimestamps = defaultDeliveryOptions.map((option, index) => ({
+      ...option,
+      createdAt: new Date(timestamp + index),
+      updatedAt: new Date(timestamp + index),
+    }));
 
-  console.log('Default data added to the database.');
+    const cartItemsWithTimestamps = defaultCart.map((item, index) => ({
+      ...item,
+      createdAt: new Date(timestamp + index),
+      updatedAt: new Date(timestamp + index),
+    }));
+
+    const ordersWithTimestamps = defaultOrders.map((order, index) => ({
+      ...order,
+      createdAt: new Date(timestamp + index),
+      updatedAt: new Date(timestamp + index),
+    }));
+
+    await Product.bulkCreate(productsWithTimestamps);
+    await DeliveryOption.bulkCreate(deliveryOptionsWithTimestamps);
+    await CartItem.bulkCreate(cartItemsWithTimestamps);
+    await Order.bulkCreate(ordersWithTimestamps);
+
+    console.log('Default data added to the database.');
+  }
+
+  initialized = true;
 }
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+// Initialize before handling requests
+app.use(async (req, res, next) => {
+  try {
+    await initializeDatabase();
+    next();
+  } catch (error) {
+    next(error);
+  }
 });
+
+export default app;
