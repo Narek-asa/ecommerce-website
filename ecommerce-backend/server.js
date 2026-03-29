@@ -50,6 +50,9 @@ app.use((err, req, res, next) => {
 
 let initialized = false;
 
+console.log('server start');
+console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
+
 async function initializeDatabase() {
   if (initialized) return;
 
