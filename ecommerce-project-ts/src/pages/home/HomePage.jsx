@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router';
 import { Header } from '../../components/Header.tsx';
 import { ProductsGrid } from './ProductsGrid.jsx';
 import './HomePage.css';
+import { API_BASE } from '../../api/config.js';
 
 export function HomePage({ cart, loadCart }) {
   const [searchParams] = useSearchParams();
@@ -12,12 +13,20 @@ export function HomePage({ cart, loadCart }) {
 
   useEffect(() => {
     const getHomeData = async () => {
-      const urlPath = search
-        ? `api/products?search=${encodeURIComponent(search)}`
-        : `api/products`;
+      try {
+        const urlPath = search
+          ? `${API_BASE}/api/products?search=${encodeURIComponent(search)}`
+          : `${API_BASE}/api/products`;
 
-      const response = await axios.get(urlPath);
-      setProducts(response.data);
+        console.log('Requesting:', urlPath);
+
+        const response = await axios.get(urlPath);
+        console.log('Response:', response.data);
+
+        setProducts(response.data);
+      } catch (error) {
+        console.error('Failed to load products:', error);
+      }
     };
 
     getHomeData();
