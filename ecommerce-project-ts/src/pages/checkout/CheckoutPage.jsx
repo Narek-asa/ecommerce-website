@@ -4,6 +4,7 @@ import { CheckoutHeader } from './CheckoutHeader.jsx';
 import { OrderSummary } from './OrderSummary.jsx';
 import { PaymentSummary } from './PaymentSummary.jsx';
 import './CheckoutPage.css';
+import { API_BASE } from '../../api/config.js';
 
 export function CheckoutPage({ cart, loadCart }) {
   const [deliveryOptions, setDeliveryOptions] = useState([]);
@@ -22,7 +23,7 @@ export function CheckoutPage({ cart, loadCart }) {
 
   useEffect(() => {
     const fetchPaymentSummaryData = async () => {
-      const response = await axios.get('api/payment-summary');
+      const response = await axios.get(`${API_BASE}/api/payment-summary`);
       setPaymentSummary(response.data);
     };
 
