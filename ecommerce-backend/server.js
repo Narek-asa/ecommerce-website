@@ -91,6 +91,10 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/reset', resetRoutes);
 app.use('/api/payment-summary', paymentSummaryRoutes);
 
+app.get('/', (req, res) => {
+  res.json({ message: 'Backend is running' });
+});
+
 app.get('/api/health', (req, res) => {
   res.json({ ok: true });
 });
