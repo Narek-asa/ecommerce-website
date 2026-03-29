@@ -3,8 +3,6 @@ import { useState } from 'react';
 import type { ChangeEvent } from 'react';
 import CartIcon from '../assets/images/icons/cart-icon.png';
 import SearchIcon from '../assets/images/icons/search-icon.png';
-import LogoWhite from '../assets/images/logo-white.png';
-import MobileLogoWhite from '../assets/images/mobile-logo-white.png';
 import './Header.css';
 
 type HeaderProps = {
