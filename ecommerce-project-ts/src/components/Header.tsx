@@ -1,10 +1,11 @@
 import { NavLink, useNavigate, useSearchParams } from 'react-router';
+import { useState } from 'react';
+import type { ChangeEvent } from 'react';
 import CartIcon from '../assets/images/icons/cart-icon.png';
 import SearchIcon from '../assets/images/icons/search-icon.png';
 import LogoWhite from '../assets/images/logo-white.png';
 import MobileLogoWhite from '../assets/images/mobile-logo-white.png';
 import './Header.css';
-import { useState } from 'react';
 
 type HeaderProps = {
   cart: {
@@ -22,7 +23,7 @@ export function Header({ cart }: HeaderProps) {
 
   const [search, setSearch] = useState(searchText || '');
 
-  const updateSearchInput = (event) => {
+  const updateSearchInput = (event: ChangeEvent<HTMLInputElement>) => {
     setSearch(event.target.value);
   };
 
@@ -64,7 +65,6 @@ export function Header({ cart }: HeaderProps) {
           <NavLink className="orders-link header-link" to="/orders">
             <span className="orders-text">Orders</span>
           </NavLink>
-
           <NavLink className="cart-link header-link" to="/checkout">
             <img className="cart-icon" src={CartIcon} />
             <div className="cart-quantity">{totalQuantity}</div>
