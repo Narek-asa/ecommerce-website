@@ -1,5 +1,8 @@
 import { Sequelize } from 'sequelize';
-import pg from 'pg';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+const pg = require('pg');
 
 const databaseUrl = process.env.DATABASE_URL;
 
@@ -16,8 +19,8 @@ export const sequelize = new Sequelize(databaseUrl, {
         ? {
           ssl: {
             require: true,
-            rejectUnauthorized: false,
-          },
+            rejectUnauthorized: false
+          }
         }
-        : {},
+        : {}
 });
