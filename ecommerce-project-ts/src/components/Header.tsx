@@ -40,7 +40,7 @@ export function Header({ cart }: HeaderProps) {
       <div className="header">
         <div className="left-section">
           <NavLink to="/" className="header-link">
-            <span>NA\</span>
+            <span className="logo-text">NA\</span>
           </NavLink>
         </div>
 
